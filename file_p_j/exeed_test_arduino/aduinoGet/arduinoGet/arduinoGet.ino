@@ -1,8 +1,7 @@
 #include <SoftwareSerial.h>
-#define SW 8
-#define LED 6
-SoftwareSerial se_read(12, 13); // write only
-SoftwareSerial se_write(10, 11); // read only
+
+SoftwareSerial se_read(12, 13); // write only (D1, D0)
+SoftwareSerial se_write(10, 11); // read only (D6, D5)
 
 struct ProjectData {
   int32_t is_button_pressed;
@@ -10,8 +9,7 @@ struct ProjectData {
   int32_t light_lux;
   float sound;
   int32_t door;
-  int32_t plus;
-} project_data = { 1, 30.11988, 360 , -651.654, 0,-1};
+} project_data = { 1, 30.11988, 360 , -651.654, 0};
 
 struct ServerData {
   int32_t is_button_pressed;
@@ -19,8 +17,7 @@ struct ServerData {
   int32_t light_lux;
   float sound;
   int32_t door;
-  int32_t plus;
-} server_data = { 0, 0, 0, 0, 0 ,-1};
+} server_data = { 0, 0, 0, 0, 0 };
 
 const char GET_SERVER_DATA = 1;
 const char GET_SERVER_DATA_RESULT = 2;
@@ -39,7 +36,7 @@ void send_to_nodemcu(char code, void *data, char data_size) {
 }
 
 void setup() {
-  // put your setup code here, to run once:
+    // put your setup code here, to run once:
   Serial.begin(115200);
   se_read.begin(38400);
   se_write.begin(38400);
@@ -47,46 +44,24 @@ void setup() {
   while (!se_read.isListening()) {
     se_read.listen();
   }
-  pinMode(SW,INPUT_PULLUP);
-  pinMode(LED,OUTPUT);
+
   Serial.println((int)sizeof(ServerData));
   Serial.println("ARDUINO READY!");
+
 }
 
 uint32_t last_sent_time = 0;
-boolean is_data_header = false;
-char expected_data_size = 0;
-char cur_data_header = 0;
-char buffer[256];
-int8_t cur_buffer_length = -1;
-int32_t b = -1;
+
 void loop() {
+  // put your main code here, to run repeatedly:
   uint32_t cur_time = millis();
   //send to nodemcu
-  int a = digitalRead(SW);
-  if(a == 0){
-    Serial.println("Press");
-    b*=-1;
-    delay(500);
-  }
-  project_data.plus = b;
-  if(server_data.plus == 1){
-    digitalWrite(LED,HIGH);
-  }
-  else{
-    digitalWrite(LED,LOW);
-  }
-  
-  if (cur_time - last_sent_time > 500) {//always update
-    Serial.println(project_data.plus);
-    send_to_nodemcu(GET_SERVER_DATA, &server_data, sizeof(ServerData));
-
+  if (cur_time - last_sent_time > 50) {//always update
+    send_to_nodemcu(UPDATE_PROJECT_DATA, &project_data, sizeof(ProjectData));
+//    send_to_nodemcu(GET_SERVER_DATA, &server_data, sizeof(ServerData));
     last_sent_time = cur_time;
   }
 
-  //read from sensor....
-  //send to nodemcu
-  
   //read data from server pass by nodemcu
   while (se_read.available()) {
     char ch = se_read.read();
@@ -123,8 +98,6 @@ void loop() {
             } else {
               digitalWrite(LED_BUILTIN, LOW);
             }
-            server_data.plus = data->plus;
-            
             send_to_nodemcu(UPDATE_PROJECT_DATA, &project_data, sizeof(ProjectData));
             Serial.println("Send data");
           } break;
@@ -134,4 +107,3 @@ void loop() {
     }
   }
 }
-

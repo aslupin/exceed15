@@ -36,7 +36,7 @@ void setup(){
     Serial.begin(115200);
     se_read.begin(38400);
     se_write.begin(38400);
-    pinMode(LED,OUTPUT);
+//    pinMode(LED,OUTPUT);
     while(!se_read.isListening()){
         se_read.listen();
     }
@@ -45,7 +45,7 @@ void setup(){
 }
 
 uint32_t last_sent_time = 0;
-char expected_data_size - 0; // REQ DATA
+char expected_data_size = 0; // REQ DATA
 char cur_data_header = 0;
 char buffer[256];
 int32_t cur_buffer_length = -1;
