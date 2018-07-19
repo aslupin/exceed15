@@ -24,9 +24,9 @@
 #define LED 4
 #define SW 5
 
-bool cs = 1; 
-bool ls = 1;
-bool state = LOW;
+bool cs = LOW; 
+bool ls = LOW;
+int state = LOW;
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -38,10 +38,15 @@ void setup() {
 
 // the loop function runs over and over again forever
 void loop() {
-  cs = digitalRead(SW);
-  if(ls == 0 && cs == 1){
-      state != state;
-  }
+  if(digitalRead(SW)){
+      state =! state;
+    }
   digitalWrite(LED,state);
+////  digitalWrite(LED, HIGH);
+////  cs = digitalRead(SW);
+//  if(ls == LOW && digitalRead(SW) == 0){
+//      state != state;
+//  }
+//  digitalWrite(LED,state);
   
 }
