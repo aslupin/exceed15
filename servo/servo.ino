@@ -1,6 +1,6 @@
 
 #include <Servo.h>
-#define servo 9
+#define servo 14
 Servo myservo;
 void setup() {
   // put your setup code here, to run once:

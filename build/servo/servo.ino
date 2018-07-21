@@ -1,13 +1,17 @@
-#define buzzer 9
+#include <Servo.h>
+#define servo 14
+Servo myservo;
+
 void setup() {
   // put your setup code here, to run once:
-  pinMode(buzzer, OUTPUT);
+  myservo.attach(servo);
+  myservo.write(0);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  analogWrite(buzzer, HIGH);
+  myservo.write(110);
   delay(1000);
-  analogWrite(buzzer, LOW);
+  myservo.write(0);
   delay(1000);
 }
